@@ -1,0 +1,90 @@
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
+import { AuthService } from './auth.service';
+
+import { CreateUserDto, UpdateAuthDto, LoginDto, RegisterUserDto  } from './dto';
+import { AuthGuard } from './guards/auth.guard';
+import { User } from './entities/user.entity';
+import { LoginResponse } from './interfaces/login-response';
+
+/* import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateAuthDto } from './dto/update-auth.dto';
+import { LoginDto } from './dto/login.dto';
+import { RegisterUserDto } from './dto/register-user.dto'; */
+
+
+// El path seria: http://localhost:3000/auth
+@Controller('auth')
+export class AuthController {
+  constructor(private readonly authService: AuthService) {}
+
+  /* Todo esto se crea mediante el comando: nest g resource auth */
+  @Post()
+  create(@Body() createUserDto: CreateUserDto) {
+    // Aca se reciben todos los datos por el Body y se deben de ajustar de acuerdo a los que definimos en el Dto.
+    //console.log(createAuthDto);
+    // Este metodo toma el Body y hace que luzca como CreateUserDto
+    return this.authService.create(createUserDto);
+  }
+
+  // Creamos este metodo para login
+  @Post('/login')
+  login(@Body() loginDto: LoginDto ) {
+    //return 'Login works!';
+    return this.authService.login( loginDto );
+  }
+
+  // Creamos este metodo para register
+  @Post('/register')
+  register(@Body() registerUserDto: RegisterUserDto ) {
+    //return 'Register works!';
+    return this.authService.register( registerUserDto );
+  }
+
+  // Colocamos un nuevo decorador si tiene permiso se muestran los usuarios.
+  /* @UseGuards( AuthGuard )
+  @Get()
+  findAll() {
+    return this.authService.findAll();
+   }*/
+
+  // Aca en este metodo de obtener todos los usuarios, obtenemos el id del usuario cunado se pasa por el AuthGuard.
+  // Para ello se pasa el decorador @Request() 
+  @UseGuards( AuthGuard )
+  @Get()
+  findAll( @Request() req: Request ) {
+    //console.log({req});
+    //const user = req['user'];
+    
+    //return user;
+    return this.authService.findAll();
+  }
+
+  // Creamos este metodo para obtener un nuevo Token
+  @UseGuards( AuthGuard )
+  @Get('/check-token')
+  checkToken( @Request() req: Request ): LoginResponse {
+    
+    const user = req['user'] as User;
+
+    return {
+      user,
+      token: this.authService.getJwtToken({ id: user._id })
+    }
+
+  }
+
+/*   @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.authService.findOne(+id);
+  } */
+
+/*   @Patch(':id')
+  update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
+    return this.authService.update(+id, updateAuthDto);
+  } */
+
+/*   @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.authService.remove(+id);
+  } */
+}

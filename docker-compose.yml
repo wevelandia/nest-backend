@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  db:
+    container_name: mean-db
+    image: mongo:6.0
+    volumes:
+      - ./mongo:/data/db
+    command: 
+      bash -c "chown -R 999:999 /data/db && mongod --bind_ip_all"  
+    ports:
+      - 27017:27017
+    restart: always
