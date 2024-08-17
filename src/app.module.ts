@@ -8,7 +8,9 @@ import { ConfigModule } from '@nestjs/config';
     // Con la siguiente linea se tiene accesos a las variables de entorno.
     ConfigModule.forRoot(),
     // Aca se da la ruta de la Base de Datos
-    MongooseModule.forRoot( process.env.MONGO_URI ),
+    MongooseModule.forRoot( process.env.MONGO_URI, {
+      dbName: process.env.MONGO_DB_NAME,
+    }),
     AuthModule
   ],
   controllers: [],
